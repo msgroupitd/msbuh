@@ -1,156 +1,144 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Бухгалтерія Master Service</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-      body {
-        margin: 0;
-        padding: 20px;
-        font-family: sans-serif;
-        transition: background-color 0.3s, color 0.3s;
-      }
+<head>
+  <meta charset="utf-8" />
+  <title>Бухгалтерія Master Service</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
 
-      .container {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        background: rgba(0,0,0,0.05);
-        padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      }
+    .container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(0,0,0,0.05);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
 
-      .avatar {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: #ccc;
-      }
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ccc;
+    }
 
-      .user-info {
-        display: flex;
-        flex-direction: column;
-      }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
 
-      .name {
-        font-size: 1.2em;
-        font-weight: bold;
-      }
+    .name {
+      font-size: 1.2em;
+      font-weight: bold;
+    }
 
-      .userid {
-        color: gray;
-      }
+    .userid {
+      color: gray;
+    }
 
-      .dark {
-        background-color: #1c1c1e;
-        color: #fff;
-      }
+    .dark {
+      background-color: #1c1c1e;
+      color: #fff;
+    }
 
-      .dark .container {
-        background: rgba(255,255,255,0.05);
-        box-shadow: 0 4px 12px rgba(255,255,255,0.1);
-      }
+    .dark .container {
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+    }
 
-      .dark .userid {
-        color: #aaa;
-      }
-    </style>
-  </head>
-  <body>
-<h4>Правила використання цього Бота</h4> 
-<p>Переконайтеся, що ваше Прізвище та Ім'я вказані правильно та відповідають реальним даним. Це необхідно для того, щоб співробітник Бухгалтерії міг коректно вас ідентифікувати та розуміти, з ким він спілкується.</p> 
-<p>ℹ️ Нижче ви можете побачити, як ваше ім'я та ID відображаються для співробітника відділу Бухгалтерії. Якщо ПІБ зазначено некоректно, будь ласка, змініть його в налаштуваннях Telegram.</p>
+    .dark .userid {
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h4>Правила використання цього Бота</h4> 
+  <p>Переконайтеся, що ваше Прізвище та Ім'я вказані правильно та відповідають реальним даним. Це необхідно для того, щоб співробітник Бухгалтерії міг коректно вас ідентифікувати та розуміти, з ким він спілкується.</p> 
+  <p>ℹ️ Нижче ви можете побачити, як ваше ім'я та ID відображаються для співробітника відділу Бухгалтерії. Якщо ПІБ зазначено некоректно, будь ласка, змініть його в налаштуваннях Telegram.</p>
 
-    <div class="container">
-      <img class="avatar" id="avatar" alt="avatar" />
-      <div class="user-info">
-        <div class="name" id="name"></div>
-        <div class="userid" id="userid"></div>
-      </div>
+  <div class="container">
+    <img class="avatar" id="avatar" alt="avatar" />
+    <div class="user-info">
+      <div class="name" id="name"></div>
+      <div class="userid" id="userid"></div>
     </div>
+  </div>
 
-    <script type="text/javascript">
-      window.onload = function () {
-        Telegram.WebApp.ready();
-        const user = Telegram.WebApp.initDataUnsafe.user;
+  <script type="text/javascript">
+    window.onload = function () {
+      Telegram.WebApp.ready();
 
-        if (!user) {
-          console.error("Неможливо отримати дані користувача.");
-          return;
-        }
+      const user = Telegram.WebApp.initDataUnsafe?.user;
 
-        const fullName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-        const userId = user.id.toString();
+      if (!user) {
+        console.error("Неможливо отримати дані користувача.");
+        document.getElementById('name').innerText = 'Невідомий користувач';
+        return;
+      }
 
-        // Показать имя и userId
-        document.getElementById('name').innerText = fullName;
-        document.getElementById('userid').innerText = 'ID: ' + userId;
+      const fullName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+      const userId = user.id.toString();
 
-        // Фото пользователя (если есть)
-        const avatar = document.getElementById('avatar');
-        if (user.photo_url) {
-          avatar.src = user.photo_url;
-        } else {
-          avatar.src = 'https://via.placeholder.com/64?text=?'; // Заглушка
-        }
+      document.getElementById('name').innerText = fullName;
+      document.getElementById('userid').innerText = 'ID: ' + userId;
 
-        // Поддержка тёмной темы
-        const themeParams = Telegram.WebApp.themeParams;
-        if (themeParams.bg_color && getLuminance(themeParams.bg_color) < 128) {
-          document.body.classList.add('dark');
-        }
+      const avatar = document.getElementById('avatar');
+      avatar.src = user.photo_url || 'https://via.placeholder.com/64?text=?';
 
-        // HelpCrunch
-        window.helpcrunchSettings = {
-          organization: 'msbuh',
-          appId: '7ec37a5c-12dd-4036-9ccf-f2f5810634be',
-          user: {
-            name: fullName,
-            user_id: userId
-          }
-        };
+      const themeParams = Telegram.WebApp.themeParams;
+      if (themeParams.bg_color && getLuminance(themeParams.bg_color) < 128) {
+        document.body.classList.add('dark');
+      }
 
-        (function (w, d) {
-          var hS = w.helpcrunchSettings;
-          if (!hS || !hS.organization) return;
+      function getLuminance(hex) {
+        const c = hex.replace('#', '');
+        const r = parseInt(c.substr(0, 2), 16);
+        const g = parseInt(c.substr(2, 2), 16);
+        const b = parseInt(c.substr(4, 2), 16);
+        return 0.299 * r + 0.587 * g + 0.114 * b;
+      }
+    };
+  </script>
 
-          var widgetSrc = 'https://embed.helpcrunch.com/sdk.js';
-          w.HelpCrunch = function () {
-            w.HelpCrunch.q.push(arguments);
-          };
-          w.HelpCrunch.q = [];
-
-          function r() {
-            if (d.querySelector('script[src="' + widgetSrc + '"]')) return;
-            var s = d.createElement('script');
-            s.async = 1;
-            s.type = 'text/javascript';
-            s.src = widgetSrc;
-            (d.body || d.head).appendChild(s);
-          }
-
-          if (d.readyState === 'complete' || hS.loadImmediately) {
-            r();
-          } else if (w.attachEvent) {
-            w.attachEvent('onload', r);
-          } else {
-            w.addEventListener('load', r, false);
-          }
-        })(window, document);
-
-        // Вспомогательная функция: яркость цвета
-        function getLuminance(hex) {
-          const c = hex.replace('#', '');
-          const r = parseInt(c.substr(0, 2), 16);
-          const g = parseInt(c.substr(2, 2), 16);
-          const b = parseInt(c.substr(4, 2), 16);
-          return 0.299 * r + 0.587 * g + 0.114 * b;
-        }
-      };
-    </script>
-  </body>
+  <!-- HelpCrunch БЕЗ параметров пользователя -->
+  <script type="text/javascript">
+    window.helpcrunchSettings = {
+      organization: 'msbuh',
+      appId: '7ec37a5c-12dd-4036-9ccf-f2f5810634be',
+    };
+  </script>
+  <script type="text/javascript">
+    (function(w,d){
+      var hS=w.helpcrunchSettings;
+      if(!hS||!hS.organization){return;}
+      var widgetSrc='https://embed.helpcrunch.com/sdk.js';
+      w.HelpCrunch=function(){w.HelpCrunch.q.push(arguments)};
+      w.HelpCrunch.q=[];
+      function r(){
+        if (d.querySelector('script[src="' + widgetSrc + '"]')) { return; }
+        var s=d.createElement('script');
+        s.async=1;
+        s.type='text/javascript';
+        s.src=widgetSrc;
+        (d.body||d.head).appendChild(s);
+      }
+      if(d.readyState === 'complete'||hS.loadImmediately){
+        r();
+      } else if(w.attachEvent){
+        w.attachEvent('onload',r);
+      } else {
+        w.addEventListener('load',r,false);
+      }
+    })(window, document);
+  </script>
+</body>
 </html>
